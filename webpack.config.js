@@ -7,15 +7,19 @@
  * webpack 打包图片资源
  */
 
+// 设置nodeJS环境变量
+process.env.NODE_ENV = 'development'
+
 // 引入html-webpack-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 const {resolve} = require('path')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/js/index.js',
   output: {
-    filename: 'build.js',
+    filename: './js/build.js',
     path: resolve(__dirname, 'build')
   },
   module: {
@@ -23,14 +27,31 @@ module.exports = {
       {
         test: /\.css/,
         use: [
-          'style-loader',
-          'css-loader'
+          // {loader: 'style-loader'},
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          /**
+           * css兼容新处理 postcss => postcss-loader postcss-preset-env
+           */
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    'postcss-preset-env'
+                  ]
+                ]
+              }
+            }
+          }
         ]
       },
       {
         test: /\.less$/,
         use: [
-          'style-loader',
+          // 'style-loader',
+          MiniCssExtractPlugin.loader,
           'css-loader',
           'less-loader'
         ]
@@ -47,8 +68,7 @@ module.exports = {
           }
         },
         generator:{
-          filename:'img/[name].[hash:10][ext]',
-          publicPath:'./'
+          filename:'img/[name].[hash:10][ext]'
         }
       },
       {
@@ -57,6 +77,10 @@ module.exports = {
          */
         test: /\.html$/,
         loader: 'html-loader'
+      },
+      {
+        test: /\.(ttf|eot|woffwoff2|svg)$/,
+        loader: 'file-loader'
       }
     ]
   },
@@ -65,9 +89,13 @@ module.exports = {
       template: './src/index.html',
       filename: 'index.html',
       title: 'webpack打包图片资源'
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'css/main.css'
     })
   ],
-  mode: 'development',
+  // mode: 'development',
+  mode: 'production',
   /** 
    * sevServer不属于5大核心配置，它的作用是修改文件之后进行自动打包，打开并刷新浏览器
    */

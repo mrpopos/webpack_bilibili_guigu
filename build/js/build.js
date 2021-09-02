@@ -1,0 +1,1 @@
+!function(){"use strict";[1,2,3,4,5,6].reduce(((c,e)=>c+e),0)}();
